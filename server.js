@@ -6,12 +6,7 @@ const cors = require('cors');
 const app = express();
 
 
-app.use(cors({
-    origin: process.env.FRONTEND_URL || '*', // Replace with your frontend URL in production
-    methods: ['GET', 'POST'],
-    credentials: true
-  }));
-
+app.use(cors())
 app.use(express.json());
 
 // Initialize LangFlow client
@@ -80,12 +75,7 @@ app.post('/api/process', async (req, res) => {
     }
 });
 
-// Export the Express API
-module.exports = app;
-
-// Only start the server if not running on Vercel
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(config.PORT, () => {
-        console.log(`Server running on port ${config.PORT}`);
-    });
-}
+// Start the server
+app.listen(config.PORT, () => {
+    console.log(`Server running on port ${config.PORT}`);
+});
