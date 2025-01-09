@@ -1,15 +1,19 @@
-// server.js
+// server.js - Updated version
 const express = require('express');
 const LangflowClient = require('./langflowClient');
 const config = require('./config');
 const cors = require('cors');
 const app = express();
 
+// Update CORS configuration for production
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*', // Replace with your frontend URL in production
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
 
-app.use(cors())
 app.use(express.json());
 
-// Initialize LangFlow client
 const langflowClient = new LangflowClient(
     config.LANGFLOW_BASE_URL,
     config.APPLICATION_TOKEN
@@ -19,7 +23,6 @@ const langflowClient = new LangflowClient(
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK' });
 });
-
 
 // Main API endpoint for processing messages
 app.post('/api/process', async (req, res) => {
@@ -75,7 +78,12 @@ app.post('/api/process', async (req, res) => {
     }
 });
 
-// Start the server
-app.listen(config.PORT, () => {
-    console.log(`Server running on port ${config.PORT}`);
-});
+// Export the Express API
+module.exports = app;
+
+// Only start the server if not running on Vercel
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(config.PORT, () => {
+        console.log(`Server running on port ${config.PORT}`);
+    });
+}
